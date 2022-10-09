@@ -24,17 +24,17 @@
                   </div>
                 </div>
                 <div class="product-thumbs">
-                  <carousel class="product-thumbs-track ps-slider" :items="3" :nav="false" :dots="false">
-                    <div class="pt active" @click="changeImage(thumbs[0])" :class="thumbs[0] == default_photo ? active : ''">
+                  <carousel class="product-thumbs-track ps-slider" :items="3" :autoplay="true" :nav="false" :dots="false">
+                    <div class="pt active" @click="changeImage(thumbs[0])" :class="thumbs[0] == gambar_default ? 'active' : ''">
                       <img src="img/product-single/product-1.png" alt="" />
                     </div>
-                    <div class="pt" @click="changeImage(thumbs[1])" :class="thumbs[1] == default_photo ? active : ''">
+                    <div class="pt" @click="changeImage(thumbs[1])" :class="thumbs[1] == gambar_default ? 'active' : ''">
                       <img src="img/product-single/product-2.png" alt="" />
                     </div>
-                    <div class="pt" @click="changeImage(thumbs[2])" :class="thumbs[2] == default_photo ? active : ''">
+                    <div class="pt" @click="changeImage(thumbs[2])" :class="thumbs[2] == gambar_default ? 'active' : ''">
                       <img src="img/product-single/product-3.png" alt="" />
                     </div>
-                    <div class="pt" @click="changeImage(thumbs[3])" :class="thumbs[3] == default_photo ? active : ''">
+                    <div class="pt" @click="changeImage(thumbs[3])" :class="thumbs[3] == gambar_default ? 'active' : ''">
                       <img src="img/product-single/product-3.png" alt="" />
                     </div>
                   </carousel>
@@ -287,6 +287,7 @@ export default {
         'img/product-single/product-3.png',
         'img/product-single/product-3.png',
       ],
+      default_photo: '',
     };
   },
   methods: {
