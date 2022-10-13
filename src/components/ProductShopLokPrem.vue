@@ -23,19 +23,19 @@
                     <i class="fa fa-search-plus"></i>
                   </div>
                 </div>
-                <div class="product-thumbs">
+                <div class="product-thumbs" v-if="productDetails.galleries.length > 0">
                   <carousel class="product-thumbs-track ps-slider" :items="3" :autoplay="true" :nav="false" :dots="false">
-                    <div class="pt active" @click="changeImage(thumbs[0])" :class="thumbs[0] == gambar_default ? 'active' : ''">
+                    <!-- <div class="pt active" @click="changeImage(thumbs[0])" :class="thumbs[0] == gambar_default ? 'active' : ''">
                       <img src="img/product-single/product-1.png" alt="" />
-                    </div>
-                    <div class="pt" @click="changeImage(thumbs[1])" :class="thumbs[1] == gambar_default ? 'active' : ''">
-                      <img src="img/product-single/product-2.png" alt="" />
-                    </div>
-                    <div class="pt" @click="changeImage(thumbs[2])" :class="thumbs[2] == gambar_default ? 'active' : ''">
-                      <img src="img/product-single/product-3.png" alt="" />
-                    </div>
-                    <div class="pt" @click="changeImage(thumbs[3])" :class="thumbs[3] == gambar_default ? 'active' : ''">
-                      <img src="img/product-single/product-3.png" alt="" />
+                    </div> -->
+                    <div
+                      v-for="item in productDetails.galleries"
+                      :key="item.id"
+                      class="pt"
+                      @click="changeImage(item.photo)"
+                      :class="item.photo == gambar_default ? 'active' : '' "
+                    >
+                      <img :src="item.photo" alt />
                     </div>
                   </carousel>
                 </div>
@@ -43,19 +43,16 @@
               <div class="col-lg-6">
                 <div class="product-details text-left">
                   <div class="pd-title text-left">
-                    <span>oranges</span>
-                    <h3>Pure Pineapple</h3>
+                    <span>{{ productDetails.type }}</span>
+                    <h3>{{ productDetails.name }}</h3>
                     <a href="#" class="heart-icon"><i class="icon_heart_alt"></i></a>
                   </div>
 
                   <div class="pd-desc">
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur ing elit, sed do eiusmod tempor sum dolor sit amet, consectetur adipisicing elit, sed do
-                      mod tempor
-                    </p>
-                    <h4>$495.00 <span>629.99</span></h4>
+                    <p v-html="productDetails.description"></p>
+                    <h4>${{ productDetails.price }}</h4>
                   </div>
-                  <div class="pd-color">
+                  <!-- <div class="pd-color">
                     <h6>Color</h6>
                     <div class="pd-color-choose">
                       <div class="cc-item">
@@ -89,9 +86,9 @@
                       <input type="radio" id="xl-size" />
                       <label for="xl-size">xs</label>
                     </div>
-                  </div>
+                  </div> -->
                   <div class="quantity">
-                    <router-link to="/product/shoppingCart"><a href="#" class="primary-btn pd-cart">Add To Cart</a></router-link>
+                    <router-link to="/product/shoppingCart"><a @click="saveKeranjang(productDetails.id, productDetails.name, productDetails.price, productDetails.galleries[0].photo)" href="#" class="primary-btn pd-cart">Add To Cart</a></router-link>
                   </div>
                 </div>
               </div>
@@ -273,28 +270,72 @@
 
 <script>
 import carousel from 'vue-owl-carousel';
+import axios from "axios";
 export default {
   name: 'ProductShopLokPrem',
   components: {
     carousel,
   },
+  // data() {
+  //   return {
+  //     gambar_default: 'img/product-single/product-1.png',
+  //     thumbs: [
+  //       'img/product-single/product-1.png',
+  //       'img/product-single/product-2.png',
+  //       'img/product-single/product-3.png',
+  //       'img/product-single/product-3.png',
+  //     ],
+  //     default_photo: '',
+  //   };
+  // },
   data() {
     return {
-      gambar_default: 'img/product-single/product-1.png',
-      thumbs: [
-        'img/product-single/product-1.png',
-        'img/product-single/product-2.png',
-        'img/product-single/product-3.png',
-        'img/product-single/product-3.png',
-      ],
-      default_photo: '',
+      gambar_default: "",
+      productDetails: [],
+      keranjangUser: []
     };
   },
+  
   methods: {
     changeImage(urlImage) {
       this.gambar_default = urlImage;
     },
+    setDataPicture(data) {
+      this.productDetails = data;
+      this.gambar_default = data.galleries[0].photo;
+    },
+    saveKeranjang(idProduct, nameProduct, priceProduct, photoProduct) {
+
+      var productStored = {
+        "id": idProduct,
+        "name": nameProduct,
+        "price": priceProduct,
+        "photo": photoProduct
+      }
+
+      this.keranjangUser.push(productStored);
+      const parsed = JSON.stringify(this.keranjangUser);
+      localStorage.setItem('keranjangUser', parsed);
+    }
   },
+  mounted() {
+    if (localStorage.getItem('keranjangUser')) {
+      try {
+        this.keranjangUser = JSON.parse(localStorage.getItem('keranjangUser'));
+      } catch(e) {
+        localStorage.removeItem('keranjangUser');
+      }
+    }
+    axios
+      .get("http://shayna-backend.belajarkoding.com/api/products", {
+        params: {
+          id: this.$route.params.id
+        }
+      })
+      .then(res => this.setDataPicture(res.data.data))
+      // eslint-disable-next-line no-console
+      .catch(err => console.log(err));
+  }
 };
 </script>
 <style scoped>
